@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MainManager : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public TextMeshProUGUI BestScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -36,6 +38,8 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+        AddPoint(0);
+        ShowBestNameAndScore();
     }
 
     private void Update()
@@ -65,12 +69,27 @@ public class MainManager : MonoBehaviour
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        ScoreText.text = $"Name: {GameManager.Instance.playerName} - Score : {m_Points}";
+    }
+
+    public void ShowBestNameAndScore()
+    {
+        BestScoreText.text = $"Name: {GameManager.Instance.BestPlayer.playerName} - Best Score: {GameManager.Instance.BestPlayer.score}";
+    }
+
+    public void UpdateBestScore(int score) 
+    {
+        if (GameManager.Instance.BestPlayer.score < score)
+        {
+            GameManager.Instance.BestPlayer = new BestPlayer(GameManager.Instance.playerName, score);
+        }
     }
 
     public void GameOver()
     {
         m_GameOver = true;
+        UpdateBestScore(m_Points);
         GameOverText.SetActive(true);
+        ShowBestNameAndScore();
     }
 }
